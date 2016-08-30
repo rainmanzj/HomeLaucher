@@ -20,6 +20,7 @@ public class HelloAndroid extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
 		registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 
