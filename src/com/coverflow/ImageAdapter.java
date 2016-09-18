@@ -25,7 +25,11 @@ public class ImageAdapter extends BaseAdapter {
 			R.drawable.a2, 
 			R.drawable.a3,
 			R.drawable.a4, 
-			R.drawable.a5 };
+			R.drawable.a5,
+			R.drawable.a6, 
+			R.drawable.a7,
+			R.drawable.a8, 
+			R.drawable.a9};
 
 	public ImageAdapter(Context c) {
 		mContext = c;

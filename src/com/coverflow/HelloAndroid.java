@@ -20,9 +20,6 @@ public class HelloAndroid extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
-		registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 
 		CoverFlow cf = new CoverFlow(this);
 		// cf.setBackgroundResource(R.drawable.shape);
@@ -35,8 +32,26 @@ public class HelloAndroid extends Activity {
 		cf.setSelection(2, true);
 		cf.setAnimationDuration(1000);
 		setContentView(cf);
+		
+
 	}
 
+	 @Override  
+	    protected void onResume() {  
+	        // TODO Auto-generated method stub  
+	        super.onResume();  
+			registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
+			registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
+	    }  
+	      
+	    @Override  
+	    protected void onPause() {  
+	        // TODO Auto-generated method stub  
+	        super.onPause();  
+	        unregisterReceiver(BootRer);  
+	        unregisterReceiver(PowerRer);  
+	    }  
+	    
 	public  static void shutdown() {
 		new Thread() {
             public void run() {
