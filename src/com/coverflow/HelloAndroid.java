@@ -13,6 +13,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Gallery;
 
 public class HelloAndroid extends Activity {
     private PowerConnectionReceiver PowerRer=new PowerConnectionReceiver();
@@ -33,8 +37,19 @@ public class HelloAndroid extends Activity {
 		cf.setAnimationDuration(1000);
 		setContentView(cf);
 		
-
+	    Gallery g=(Gallery) cf;  
+		 //设置Gallery事件监听  
+		g.setOnItemClickListener(new OnItemClickListener() {  
+  
+            @Override  
+            public void onItemClick(AdapterView<?> parent, View v, int position,  
+                    long id) {  
+                MemuTodo(id);
+            }
+              
+        });    
 	}
+	
 	@Override
 	public void onStart(){
 		super.onStart();
@@ -48,7 +63,9 @@ public class HelloAndroid extends Activity {
 		if(BootRer != null) {
 			this.unregisterReceiver(BootRer);
 		}
-		
+		if(PowerRer != null) {
+			this.unregisterReceiver(PowerRer);
+		}
 		super.onDestroy();
 	}
 	 @Override  
@@ -66,7 +83,21 @@ public class HelloAndroid extends Activity {
 	        unregisterReceiver(BootRer);  
 	        unregisterReceiver(PowerRer);  
 	    }  
-	    
+	
+	private void MemuTodo(long id)
+	{
+		String str="菜单："+String.valueOf(id);
+        setTitle(str);
+		if(str== "0")
+		{
+			
+		}
+		else if(str=="1")
+		{
+			
+		}
+	}
+	
 	public  static void shutdown() {
 		new Thread() {
             public void run() {
