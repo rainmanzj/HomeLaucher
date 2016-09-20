@@ -10,14 +10,12 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 	 
     @Override
     public void onReceive(Context context, Intent intent) {
-    	   Intent launchService=new Intent(context, HelloAndroid.class);  
-           //启动指定Service  
-           context.startActivity(launchService);  
-//        if (intent.getAction().equals(action_boot)){ 
-//            Intent StartIntent=new Intent(context,HelloAndroid.class); //接收到广播后，跳转到MainActivity
-//            StartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-//            context.startActivity(StartIntent); 
-//       
-//      }
+ 
+        if (intent.getAction().equals(action_boot)){ 
+            Intent StartIntent=new Intent(context,HelloAndroid.class); //接收到广播后，跳转到MainActivity
+            StartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+            context.startActivity(StartIntent); 
+       
+      }
     }
 }

@@ -35,12 +35,27 @@ public class HelloAndroid extends Activity {
 		
 
 	}
-
+	@Override
+	public void onStart(){
+		super.onStart();
+		if(BootRer==null)
+			BootRer=new BootBroadcastReceiver();
+		registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
+		
+	}
+	@Override
+	public void onDestroy(){
+		if(BootRer != null) {
+			this.unregisterReceiver(BootRer);
+		}
+		
+		super.onDestroy();
+	}
 	 @Override  
 	    protected void onResume() {  
 	        // TODO Auto-generated method stub  
 	        super.onResume();  
-			registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
+
 			registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 	    }  
 	      
