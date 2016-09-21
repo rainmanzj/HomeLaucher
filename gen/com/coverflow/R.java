@@ -8,6 +8,32 @@
 package com.coverflow;
 
 public final class R {
+    public static final class array {
+        public static final int category_entries=0x7f05000c;
+        public static final int category_values=0x7f05000d;
+        public static final int dwa_entries=0x7f050011;
+        public static final int emot_entries=0x7f050004;
+        public static final int emot_values=0x7f050005;
+        /**  合成 
+         */
+        public static final int engine_entries=0x7f050000;
+        public static final int engine_values=0x7f050001;
+        public static final int ise_language_entries=0x7f05000a;
+        public static final int ise_language_values=0x7f05000b;
+        /**  语言 
+         */
+        public static final int language_entries=0x7f050008;
+        public static final int language_values=0x7f050009;
+        /**  标点符号 
+         */
+        public static final int punc_entries=0x7f05000f;
+        public static final int punc_values=0x7f050010;
+        public static final int result_level_entries=0x7f05000e;
+        public static final int stream_entries=0x7f050006;
+        public static final int stream_values=0x7f050007;
+        public static final int voicer_cloud_entries=0x7f050002;
+        public static final int voicer_cloud_values=0x7f050003;
+    }
     public static final class attr {
     }
     public static final class drawable {
@@ -23,6 +49,40 @@ public final class R {
         public static final int icon=0x7f020009;
     }
     public static final class string {
-        public static final int app_name=0x7f030000;
+        /**  请替换成在语音云官网申请的appid 
+         */
+        public static final int app_id=0x7f040001;
+        public static final int app_name=0x7f040000;
+        public static final int example_explain=0x7f040002;
+        public static final int pref_key_iat_show=0x7f04000e;
+        public static final int pref_title_iat_dwa=0x7f040010;
+        public static final int pref_title_iat_show=0x7f04000f;
+        /**  听写 
+         */
+        public static final int text_begin=0x7f040007;
+        public static final int text_begin_recognizer=0x7f040008;
+        public static final int text_cn_sentence=0x7f040016;
+        public static final int text_cn_syllable=0x7f040014;
+        public static final int text_cn_word=0x7f040015;
+        public static final int text_download_success=0x7f04000d;
+        public static final int text_en_sentence=0x7f040013;
+        /**  语音评测 
+         */
+        public static final int text_en_word=0x7f040012;
+        public static final int text_isr_abnf_hint=0x7f040005;
+        public static final int text_tts_source=0x7f040003;
+        public static final int text_tts_source_en=0x7f040004;
+        public static final int text_understand_hint=0x7f040006;
+        public static final int text_upload_contacts=0x7f040009;
+        public static final int text_upload_success=0x7f04000b;
+        public static final int text_upload_userwords=0x7f04000a;
+        public static final int text_userword_empty=0x7f04000c;
+        public static final int tts_toast_format=0x7f040011;
+    }
+    public static final class xml {
+        public static final int iat_setting=0x7f030000;
+        public static final int ise_settings=0x7f030001;
+        public static final int tts_setting=0x7f030002;
+        public static final int understand_setting=0x7f030003;
     }
 }

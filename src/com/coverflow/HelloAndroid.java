@@ -5,22 +5,32 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import com.lancher.libs.voice.XfVoice;
 import com.lancher.service.BootBroadcastReceiver;
 import com.lancher.service.PowerConnectionReceiver;
+import com.lancher.utility.AndroidProcess;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Gallery;
 
-public class HelloAndroid extends Activity {
+public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClickListener{
     private PowerConnectionReceiver PowerRer=new PowerConnectionReceiver();
 	private BootBroadcastReceiver  BootRer=new BootBroadcastReceiver();
+	private XfVoice Voice;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,18 +46,49 @@ public class HelloAndroid extends Activity {
 		cf.setSelection(2, true);
 		cf.setAnimationDuration(1000);
 		setContentView(cf);
-		
 	    Gallery g=(Gallery) cf;  
+	    Context ct = this.getApplicationContext(); 
+	    Voice=new XfVoice(ct);
+	    
+	    
 		 //设置Gallery事件监听  
 		g.setOnItemClickListener(new OnItemClickListener() {  
-  
             @Override  
             public void onItemClick(AdapterView<?> parent, View v, int position,  
                     long id) {  
-                MemuTodo(id);
+                MemuTodo(position);
             }
-              
-        });    
+        });   
+		
+		g.setOnItemSelectedListener(new OnItemSelectedListener()
+		{
+			@Override
+			public void onItemSelected(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				// TODO Auto-generated method stub
+				if(arg2== 0)
+				{
+					setTitle("菜单：优驾");
+					Voice.play("优驾");
+					//int code = mTts.startSpeaking("优驾菜单", mTtsListener);
+				}
+				else if(arg2== 1)
+				{
+					setTitle("菜单：导航");
+				}
+				else
+				{
+					setTitle("菜单：声控");
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+        });   
+	
 	}
 	
 	@Override
@@ -84,19 +125,30 @@ public class HelloAndroid extends Activity {
 	        unregisterReceiver(PowerRer);  
 	    }  
 	
-	private void MemuTodo(long id)
+	private void MemuTodo(int id)
 	{
-		String str="菜单："+String.valueOf(id);
-        setTitle(str);
-		if(str== "0")
+		if(id==0)
 		{
+	  
+			doStartApplicationWithPackageName("com.comit.gooddriver");
+		}
+		else if(id==1)
+		{
+			doStartApplicationWithPackageName("com.autonavi.minimap");
 			
 		}
-		else if(str=="1")
+		else if(id==2)
 		{
-			
+//		    //1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener  
+//		    RecognizerDialog    iatDialog = new RecognizerDialog(this,mInitListener);  
+//		    //2.设置听写参数，同上节  
+//		    //3.设置回调接口  
+//		    iatDialog.setListener(recognizerDialogListener);  
+//		    //4.开始听写  
+//		    iatDialog.show(); 
 		}
 	}
+	
 	
 	public  static void shutdown() {
 		new Thread() {
@@ -188,4 +240,10 @@ public class HelloAndroid extends Activity {
 		  }
 		  return null;
 		}
+
+	@Override
+	public void onClick(View arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

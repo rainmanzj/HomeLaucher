@@ -34,7 +34,7 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 		   }
 		   else if(status.equals(Intent.ACTION_BATTERY_CHANGED))// android.intent.action.BATTERY_CHANGED))
 		   {
-			   HelloAndroid.getActivity().setTitle("电量变化");
+			  // HelloAndroid.getActivity().setTitle("电量变化");
 		   }
 		   
 	}
