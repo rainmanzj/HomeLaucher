@@ -11,6 +11,7 @@ import com.lancher.libs.voice.IatVoice;
 import com.lancher.libs.voice.XfVoice;
 import com.lancher.service.BootBroadcastReceiver;
 import com.lancher.service.PowerConnectionReceiver;
+import com.lancher.ui.AnimationTimer;
 import com.lancher.utility.AndroidProcess;
 
 import android.annotation.SuppressLint;
@@ -30,7 +31,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -48,9 +51,9 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		   //无title   
-	   requestWindowFeature(Window.FEATURE_NO_TITLE);   
+	   //requestWindowFeature(Window.FEATURE_NO_TITLE);   
 	        //全屏   
-	   getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN , WindowManager.LayoutParams. FLAG_FULLSCREEN);
+	   //getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN , WindowManager.LayoutParams. FLAG_FULLSCREEN);
 	       
 		CoverFlow cf = new CoverFlow(this);
 		// cf.setBackgroundResource(R.drawable.shape);
@@ -69,7 +72,7 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	    IatVoice=new IatVoice(ct);
 	    mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 	    mToast.setGravity(Gravity.CENTER, 0, 0);
-
+	    Voice.play("欢迎使用，张卓恒小朋友请带安全带");
 		 //设置Gallery事件监听  
 		g.setOnItemClickListener(new OnItemClickListener() {  
             @Override  
@@ -109,6 +112,10 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 					setTitle("菜单：关机");
 					showTip("关机");
 					Voice.play("关机");
+				}
+				else
+				{
+					showTip("");
 				}
 			}
 
@@ -180,7 +187,11 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		   
 		         @Override  
 		         public void onClick(DialogInterface dialog, int which) {  
-		 			Voice.play("6秒后系统关闭");
+		 			Voice.play("6秒后系统将关闭");
+
+		 			Intent intent=new Intent(HelloAndroid.this, AnimationTimer.class);
+		 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//注意本行的FLAG设置
+		 			startActivity(intent);
 					HelloAndroid.shutdown();  
 		   
 		         }  
@@ -196,8 +207,8 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	}
 	
 	private void showTip(final String str) {
-		//mToast.setText(str);
-		//mToast.show();
+		mToast.setText(str);
+		mToast.show();
 	}
 
 	public  static void shutdown() {
