@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
+import com.lancher.libs.voice.IatVoice;
 import com.lancher.libs.voice.XfVoice;
 import com.lancher.service.BootBroadcastReceiver;
 import com.lancher.service.PowerConnectionReceiver;
@@ -12,7 +15,9 @@ import com.lancher.utility.AndroidProcess;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -20,21 +25,33 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Gallery;
 
+
 public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClickListener{
-    private PowerConnectionReceiver PowerRer=new PowerConnectionReceiver();
-	private BootBroadcastReceiver  BootRer=new BootBroadcastReceiver();
+    private PowerConnectionReceiver PowerRer=null;
+	private BootBroadcastReceiver  BootRer=null;
+	private IatVoice IatVoice;
 	private XfVoice Voice;
+
+	private Toast mToast;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		   //无title   
+	   requestWindowFeature(Window.FEATURE_NO_TITLE);   
+	        //全屏   
+	   getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN , WindowManager.LayoutParams. FLAG_FULLSCREEN);
+	       
 		CoverFlow cf = new CoverFlow(this);
 		// cf.setBackgroundResource(R.drawable.shape);
 		cf.setBackgroundColor(Color.BLACK);
@@ -49,8 +66,10 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	    Gallery g=(Gallery) cf;  
 	    Context ct = this.getApplicationContext(); 
 	    Voice=new XfVoice(ct);
-	    
-	    
+	    IatVoice=new IatVoice(ct);
+	    mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
+	    mToast.setGravity(Gravity.CENTER, 0, 0);
+
 		 //设置Gallery事件监听  
 		g.setOnItemClickListener(new OnItemClickListener() {  
             @Override  
@@ -69,16 +88,27 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 				if(arg2== 0)
 				{
 					setTitle("菜单：优驾");
+					showTip("优驾");
 					Voice.play("优驾");
-					//int code = mTts.startSpeaking("优驾菜单", mTtsListener);
+					
 				}
 				else if(arg2== 1)
 				{
 					setTitle("菜单：导航");
+					showTip("导航");
+					Voice.play("导航");
 				}
-				else
+				else if(arg2== 2)
 				{
 					setTitle("菜单：声控");
+					showTip("声控");
+					Voice.play("声控");
+				}
+				else if(arg2== 3)
+				{
+					setTitle("菜单：关机");
+					showTip("关机");
+					Voice.play("关机");
 				}
 			}
 
@@ -87,8 +117,7 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 				// TODO Auto-generated method stub
 				
 			}
-        });   
-	
+        }); 
 	}
 	
 	@Override
@@ -113,7 +142,8 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	    protected void onResume() {  
 	        // TODO Auto-generated method stub  
 	        super.onResume();  
-
+	        if(PowerRer==null)
+	        	PowerRer=new PowerConnectionReceiver();
 			registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 	    }  
 	      
@@ -121,15 +151,16 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	    protected void onPause() {  
 	        // TODO Auto-generated method stub  
 	        super.onPause();  
-	        unregisterReceiver(BootRer);  
-	        unregisterReceiver(PowerRer);  
+	        if(BootRer != null) 
+	        	unregisterReceiver(BootRer);  
+	        if(PowerRer != null) 
+	        	unregisterReceiver(PowerRer);  
 	    }  
 	
 	private void MemuTodo(int id)
 	{
 		if(id==0)
 		{
-	  
 			doStartApplicationWithPackageName("com.comit.gooddriver");
 		}
 		else if(id==1)
@@ -139,17 +170,36 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		}
 		else if(id==2)
 		{
-//		    //1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener  
-//		    RecognizerDialog    iatDialog = new RecognizerDialog(this,mInitListener);  
-//		    //2.设置听写参数，同上节  
-//		    //3.设置回调接口  
-//		    iatDialog.setListener(recognizerDialogListener);  
-//		    //4.开始听写  
-//		    iatDialog.show(); 
+			IatVoice.Listen();
+		}
+		else if(id==3)
+		{
+			new AlertDialog.Builder(this).setTitle("确认退出吗？")  
+		     .setIcon(android.R.drawable.ic_dialog_info)  
+		     .setPositiveButton("确定", new DialogInterface.OnClickListener() {  
+		   
+		         @Override  
+		         public void onClick(DialogInterface dialog, int which) {  
+		 			Voice.play("6秒后系统关闭");
+					HelloAndroid.shutdown();  
+		   
+		         }  
+		     })  
+		     .setNegativeButton("返回", new DialogInterface.OnClickListener() {  
+		   
+		         @Override  
+		         public void onClick(DialogInterface dialog, int which) {  
+		         // 点击“返回”后的操作,这里不设置没有任何操作  
+		         }  
+		     }).show();  
 		}
 	}
 	
-	
+	private void showTip(final String str) {
+		//mToast.setText(str);
+		//mToast.show();
+	}
+
 	public  static void shutdown() {
 		new Thread() {
             public void run() {

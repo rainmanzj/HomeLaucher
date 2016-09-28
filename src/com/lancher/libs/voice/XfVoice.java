@@ -23,7 +23,7 @@ public class XfVoice {
         init(context);  
     }  
     public void init(Context context){ 
-    	// 本地设置跳转到语记中
+    	// 注册
     	SpeechUtility.createUtility(context, SpeechConstant.APPID +"=57e12014");   
         //初始化语音对象  
         mTts = SpeechSynthesizer.createSynthesizer(context, mTtsInitListener);  
@@ -34,7 +34,7 @@ public class XfVoice {
     public void play(String str){  
         String text = str;  
 		//SpeechUtility.getUtility().openEngineSettings(null);				
-		SpeechUtility.getUtility().openEngineSettings(SpeechConstant.ENG_TTS);	
+		//SpeechUtility.getUtility().openEngineSettings(SpeechConstant.ENG_TTS);	
         setParam();  
         // 设置参数  
         int code = mTts.startSpeaking(text,  mTtsListener);  
@@ -76,6 +76,8 @@ public class XfVoice {
         mTts.setParameter(SpeechConstant.VOLUME, "50");  
     }  
       
+
+	
     public void destroy(){  
          mTts.stopSpeaking();  
        
