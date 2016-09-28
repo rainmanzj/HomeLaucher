@@ -43,8 +43,8 @@ import android.widget.Gallery;
 public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClickListener{
     private PowerConnectionReceiver PowerRer=null;
 	private BootBroadcastReceiver  BootRer=null;
-	private IatVoice IatVoice;
-	private XfVoice Voice;
+	public IatVoice IatVoice;
+	public static XfVoice Voice;
 
 	private Toast mToast;
 	@Override
@@ -68,12 +68,12 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		setContentView(cf);
 	    Gallery g=(Gallery) cf;  
 	    Context ct = this.getApplicationContext(); 
-	    Voice=new XfVoice(ct);
+	    HelloAndroid.Voice=new XfVoice(ct);
 	    IatVoice=new IatVoice(ct);
 	    mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
-	    mToast.setGravity(Gravity.CENTER, 0, 0);
-	    Voice.play("欢迎使用，张卓恒小朋友请带安全带");
-		 //设置Gallery事件监听  
+	    mToast.setGravity(Gravity.BOTTOM, 0, 0);
+	    
+		//设置Gallery事件监听  
 		g.setOnItemClickListener(new OnItemClickListener() {  
             @Override  
             public void onItemClick(AdapterView<?> parent, View v, int position,  
@@ -130,8 +130,10 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	@Override
 	public void onStart(){
 		super.onStart();
-		if(BootRer==null)
-			BootRer=new BootBroadcastReceiver();
+		welcome();
+        PowerRer=new PowerConnectionReceiver();
+		registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	    BootRer=new BootBroadcastReceiver();
 		registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
 		
 	}
@@ -149,19 +151,14 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	    protected void onResume() {  
 	        // TODO Auto-generated method stub  
 	        super.onResume();  
-	        if(PowerRer==null)
-	        	PowerRer=new PowerConnectionReceiver();
-			registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
+	      
 	    }  
 	      
 	    @Override  
 	    protected void onPause() {  
 	        // TODO Auto-generated method stub  
 	        super.onPause();  
-	        if(BootRer != null) 
-	        	unregisterReceiver(BootRer);  
-	        if(PowerRer != null) 
-	        	unregisterReceiver(PowerRer);  
+	      
 	    }  
 	
 	private void MemuTodo(int id)
@@ -187,12 +184,12 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		   
 		         @Override  
 		         public void onClick(DialogInterface dialog, int which) {  
-		 			Voice.play("6秒后系统将关闭");
+		 			Voice.play("10秒后系统将关闭");
 
 		 			Intent intent=new Intent(HelloAndroid.this, AnimationTimer.class);
 		 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//注意本行的FLAG设置
 		 			startActivity(intent);
-					HelloAndroid.shutdown();  
+					 
 		   
 		         }  
 		     })  
@@ -211,13 +208,27 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		mToast.show();
 	}
 
+	private void welcome()
+	{
+		new Thread(){
+			public void run(){
+//				try
+//				{
+					HelloAndroid.Voice.play("欢迎使用，小朋友请带安全带");
+//				}
+//				catch(Exception ex)
+//				{
+//				
+//				}
+			}
+			
+		}.start();
+	}
 	public  static void shutdown() {
 		new Thread() {
             public void run() {
                 try { 
-                    /*10秒后关闭页面*/
-                	getActivity().setTitle("智能中控将在6秒后关闭");
-                    sleep(6000);
+                      
 //                    MyCountTime=new CountTime(6000,1000);
 //                    MyCountTime.start();
         			Process process = Runtime.getRuntime().exec("su");
