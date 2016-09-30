@@ -10,6 +10,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.coverflow.Application;
 import com.coverflow.HelloAndroid;
 import com.coverflow.R;
 
@@ -41,7 +42,7 @@ public class AnimationTimer extends Activity {
 		count--;
 		if (count < 1 || count > 9) {
 			this.finish();
-			HelloAndroid.shutdown(); 
+			Application.Instance().shutdown(); 
 		}
 		else
 		{

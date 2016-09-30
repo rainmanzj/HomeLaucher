@@ -4,6 +4,8 @@ import java.io.DataOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
@@ -25,6 +27,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -44,9 +47,8 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
     private PowerConnectionReceiver PowerRer=null;
 	private BootBroadcastReceiver  BootRer=null;
 	public IatVoice IatVoice;
-	public static XfVoice Voice;
-
 	private Toast mToast;
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +58,6 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	   //getWindow().setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN , WindowManager.LayoutParams. FLAG_FULLSCREEN);
 	       
 		CoverFlow cf = new CoverFlow(this);
-		// cf.setBackgroundResource(R.drawable.shape);
 		cf.setBackgroundColor(Color.BLACK);
 		cf.setAdapter(new ImageAdapter(this));
 		ImageAdapter imageAdapter = new ImageAdapter(this);
@@ -68,11 +69,13 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		setContentView(cf);
 	    Gallery g=(Gallery) cf;  
 	    Context ct = this.getApplicationContext(); 
-	    HelloAndroid.Voice=new XfVoice(ct);
+	    Application.Instance().Voice=new XfVoice(ct);
 	    IatVoice=new IatVoice(ct);
 	    mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 	    mToast.setGravity(Gravity.BOTTOM, 0, 0);
+	    Application.Instance().MainActivity=this;
 	    
+
 		//设置Gallery事件监听  
 		g.setOnItemClickListener(new OnItemClickListener() {  
             @Override  
@@ -92,26 +95,26 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 				{
 					setTitle("菜单：优驾");
 					showTip("优驾");
-					Voice.play("优驾");
+					 Application.Instance().Voice.play("优驾");
 					
 				}
 				else if(arg2== 1)
 				{
 					setTitle("菜单：导航");
 					showTip("导航");
-					Voice.play("导航");
+					 Application.Instance().Voice.play("导航");
 				}
 				else if(arg2== 2)
 				{
 					setTitle("菜单：声控");
 					showTip("声控");
-					Voice.play("声控");
+					 Application.Instance().Voice.play("声控");
 				}
 				else if(arg2== 3)
 				{
 					setTitle("菜单：关机");
 					showTip("关机");
-					Voice.play("关机");
+					 Application.Instance().Voice.play("关机");
 				}
 				else
 				{
@@ -125,16 +128,43 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 				
 			}
         }); 
+		handler.postDelayed(runnableYJ,5000);         // 开始Timer
 	}
-	
+	private Handler handler = new Handler( );
+	private Runnable runnable = new Runnable( ) {
+
+	    @SuppressLint("NewApi")
+		public void run ( ) {
+	        PowerRer=new PowerConnectionReceiver();
+			registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		    BootRer=new BootBroadcastReceiver();
+			registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
+	    	showTip("启动");
+	    	if(Application.Instance().Voice!=null)
+	    	    Application.Instance().Voice.play("欢迎使用，小朋友请带安全带");
+
+			// doStartApplicationWithPackageName("com.comit.gooddriver");
+	        handler.postDelayed(this,1000);     //postDelayed(this,1000)方法安排一个Runnable对象到主线程队列中
+	        handler.removeCallbacks(runnable);           //停止Timer
+	    }
+	};
+	private Handler handlerYJ = new Handler( );
+	private Runnable runnableYJ = new Runnable( ) {
+	    @SuppressLint("NewApi")
+		public void run ( ) {
+	    	handlerYJ.postDelayed(this,1000);     //postDelayed(this,1000)方法安排一个Runnable对象到主线程队列中
+	    	handlerYJ.removeCallbacks(runnableYJ);           //停止Timer
+	    	Intent intent =getPackageManager().getLaunchIntentForPackage("com.comit.gooddriver");
+	    	if (intent!=null ){
+	    	     startActivity(intent);
+	    	}
+
+	    }
+	};
 	@Override
 	public void onStart(){
 		super.onStart();
-		welcome();
-        PowerRer=new PowerConnectionReceiver();
-		registerReceiver(PowerRer, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-	    BootRer=new BootBroadcastReceiver();
-		registerReceiver(BootRer, new IntentFilter(Intent.ACTION_BOOT_COMPLETED)); 
+		handler.postDelayed(runnable,1000);         // 开始Timer
 		
 	}
 	@Override
@@ -178,19 +208,16 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		}
 		else if(id==3)
 		{
-			new AlertDialog.Builder(this).setTitle("确认退出吗？")  
+			 Application.Instance().Voice.play("确认关闭系统吗");
+			new AlertDialog.Builder(this).setTitle("确认关闭系统吗？")  
 		     .setIcon(android.R.drawable.ic_dialog_info)  
 		     .setPositiveButton("确定", new DialogInterface.OnClickListener() {  
 		   
 		         @Override  
 		         public void onClick(DialogInterface dialog, int which) {  
-		 			Voice.play("10秒后系统将关闭");
-
 		 			Intent intent=new Intent(HelloAndroid.this, AnimationTimer.class);
 		 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//注意本行的FLAG设置
 		 			startActivity(intent);
-					 
-		   
 		         }  
 		     })  
 		     .setNegativeButton("返回", new DialogInterface.OnClickListener() {  
@@ -208,44 +235,7 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 		mToast.show();
 	}
 
-	private void welcome()
-	{
-		new Thread(){
-			public void run(){
-//				try
-//				{
-					HelloAndroid.Voice.play("欢迎使用，小朋友请带安全带");
-//				}
-//				catch(Exception ex)
-//				{
-//				
-//				}
-			}
-			
-		}.start();
-	}
-	public  static void shutdown() {
-		new Thread() {
-            public void run() {
-                try { 
-                      
-//                    MyCountTime=new CountTime(6000,1000);
-//                    MyCountTime.start();
-        			Process process = Runtime.getRuntime().exec("su");
-        			DataOutputStream out = new DataOutputStream(
-        					process.getOutputStream());
-        			out.writeBytes("reboot -p\n");
-        			out.writeBytes("exit\n");
-        			out.flush();
-
-                } catch (Exception e) {                   
-                	e.printStackTrace();
-                } finally {
-         
-                }
-            }
-        }.start();
-	}
+	
 	/*
 	 * 执行命令
 	 * @param command
@@ -281,36 +271,39 @@ public class HelloAndroid<RecyclerView> extends AndroidProcess implements OnClic
 	}
 	
 	public static Activity getActivity() {
-		  Class activityThreadClass = null;
-		  try {
-		    activityThreadClass = Class.forName("android.app.ActivityThread");
-		    Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
-		    Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
-		    activitiesField.setAccessible(true);
-		    Map activities = (Map) activitiesField.get(activityThread);
-		    for (Object activityRecord : activities.values()) {
-		      Class activityRecordClass = activityRecord.getClass();
-		      Field pausedField = activityRecordClass.getDeclaredField("paused");
-		      pausedField.setAccessible(true);
-		      if (!pausedField.getBoolean(activityRecord)) {
-		        Field activityField = activityRecordClass.getDeclaredField("activity");
-		        activityField.setAccessible(true);
-		        Activity activity = (Activity) activityField.get(activityRecord);
-		        return activity;
-		      }
-		    }
-		  } catch (ClassNotFoundException e) {
-		    e.printStackTrace();
-		  } catch (NoSuchMethodException e) {
-		    e.printStackTrace();
-		  } catch (IllegalAccessException e) {
-		    e.printStackTrace();
-		  } catch (InvocationTargetException e) {
-		    e.printStackTrace();
-		  } catch (NoSuchFieldException e) {
-		    e.printStackTrace();
-		  }
-		  return null;
+		  return  Application.Instance().MainActivity;
+//		  Class activityThreadClass = null;
+//		  try {
+//		    activityThreadClass = Class.forName("android.app.ActivityThread");
+//		    Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
+//		    Field activitiesField = activityThreadClass.getDeclaredField("mActivities");
+//		    activitiesField.setAccessible(true);
+//		    Map activities = (Map) activitiesField.get(activityThread);
+//		    for (Object activityRecord : activities.values()) {
+//		      Class activityRecordClass = activityRecord.getClass();
+//		      Field pausedField = activityRecordClass.getDeclaredField("paused");
+//		      pausedField.setAccessible(true);
+//		      if (!pausedField.getBoolean(activityRecord)) {
+//		        Field activityField = activityRecordClass.getDeclaredField("activity");
+//		        activityField.setAccessible(true);
+//		        Activity activity = (Activity) activityField.get(activityRecord);
+//		        if(activity.getClass().getName()==HelloAndroid.class.getName())
+//		        return activity;
+//		        
+//		      }
+//		    }
+//		  } catch (ClassNotFoundException e) {
+//		    e.printStackTrace();
+//		  } catch (NoSuchMethodException e) {
+//		    e.printStackTrace();
+//		  } catch (IllegalAccessException e) {
+//		    e.printStackTrace();
+//		  } catch (InvocationTargetException e) {
+//		    e.printStackTrace();
+//		  } catch (NoSuchFieldException e) {
+//		    e.printStackTrace();
+//		  }
+//		  return null;
 		}
 
 	@Override
